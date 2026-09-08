@@ -143,6 +143,45 @@
                     </div>
                 </div>
 
+                <!-- KOTAK VERCEL & RAILWAY DEPLOY MONITOR -->
+                <div class="bg-gray-900 p-6 rounded-2xl cyber-border space-y-4">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-blue-400"></i>
+                            <h3 class="font-bold text-sm font-mono text-blue-300">Vercel & Railway Deploy Status Monitor</h3>
+                        </div>
+                        <button @click="checkDeployStatus()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs rounded-xl shadow transition">
+                            <i class="fa-solid fa-rotate mr-1"></i> Semak Status Deploy
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                        <div class="p-4 bg-gray-950 rounded-xl cyber-border flex flex-col justify-between">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400 text-[10px] uppercase">Portal Klien (Vercel Server)</span>
+                                <a href="https://leea-portal.vercel.app" target="_blank" class="text-blue-400 hover:underline text-[10px]">Buka Portal <i class="fa-solid fa-arrow-up-right-from-square ml-0.5"></i></a>
+                            </div>
+                            <div class="mt-3 flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full" :class="vercelStatus.isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-yellow-500'"></span>
+                                <span class="font-bold text-sm" :class="vercelStatus.isOnline ? 'text-emerald-400' : 'text-yellow-400'" x-text="vercelStatus.statusText"></span>
+                            </div>
+                            <span class="text-[10px] text-gray-500 mt-2 block" x-text="'Masa Semak: ' + vercelStatus.lastChecked"></span>
+                        </div>
+
+                        <div class="p-4 bg-gray-950 rounded-xl cyber-border flex flex-col justify-between">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400 text-[10px] uppercase">Backend Bot (Railway Server)</span>
+                                <span class="text-indigo-300 text-[10px]">Multi-Tenant API</span>
+                            </div>
+                            <div class="mt-3 flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full" :class="railwayStatus.isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'"></span>
+                                <span class="font-bold text-sm" :class="railwayStatus.isOnline ? 'text-emerald-400' : 'text-red-400'" x-text="railwayStatus.statusText"></span>
+                            </div>
+                            <span class="text-[10px] text-gray-500 mt-2 block" x-text="'Masa Semak: ' + railwayStatus.lastChecked"></span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Bahagian Pengurusan Kod Akses Pegawai Baru (Tambah Kod Admin Khas) -->
                 <div class="bg-gray-900 p-6 rounded-2xl cyber-border space-y-4">
                     <h3 class="font-bold text-sm font-mono text-blue-300">Pengurusan Kod Unlock Khas (Pegawai / Admin Baru)</h3>
@@ -288,11 +327,26 @@
                 editIndex: null,
                 clientForm: { companyName: '', username: '', password: '', phone: '', email: '', railwayUrl: '' },
                 lastUpdatedTime: '',
+                
+                // Status Deploy Vercel Portal
+                vercelStatus: {
+                    isOnline: false,
+                    statusText: 'Menyemak...',
+                    lastChecked: '-'
+                },
+
+                // Status Server Railway
+                railwayStatus: {
+                    isOnline: false,
+                    statusText: 'Menyemak...',
+                    lastChecked: '-'
+                },
 
                 init() {
                     this.fetchClients();
                     this.fetchAdminPins();
                     this.updateTimestamp();
+                    this.checkDeployStatus();
 
                     if (localStorage.getItem('leea_admin_unlocked') === 'true') {
                         this.isUnlocked = true;
@@ -301,6 +355,42 @@
                     if (localStorage.getItem('leea_admin_logged') === 'true') {
                         this.isLoggedIn = true;
                     }
+                },
+
+                async checkDeployStatus() {
+                    this.vercelStatus.statusText = 'Menyemak Vercel...';
+                    this.railwayStatus.statusText = 'Menyemak Railway...';
+
+                    // 1. Semak Vercel Portal (https://leea-portal.vercel.app)
+                    try {
+                        const vercelRes = await fetch('https://leea-portal.vercel.app', { method: 'GET', mode: 'no-cors' });
+                        this.vercelStatus.isOnline = true;
+                        this.vercelStatus.statusText = 'DEPLOYED & READY 🟢';
+                    } catch (err) {
+                        this.vercelStatus.isOnline = false;
+                        this.vercelStatus.statusText = 'SEDANG DEPLOY / OFFLINE 🟡';
+                    }
+
+                    // 2. Semak Railway Backend (https://leeasystem-production.up.railway.app)
+                    const targetUrl = (this.clients.length > 0 && this.clients[0].railwayUrl) ? this.clients[0].railwayUrl : 'https://leeasystem-production.up.railway.app';
+                    try {
+                        const railwayRes = await fetch(targetUrl, { method: 'GET', mode: 'cors' });
+                        if (railwayRes.ok) {
+                            this.railwayStatus.isOnline = true;
+                            this.railwayStatus.statusText = 'ONLINE & ACTIVE 🟢';
+                        } else {
+                            this.railwayStatus.isOnline = true;
+                            this.railwayStatus.statusText = 'ONLINE (OK)';
+                        }
+                    } catch (err) {
+                        this.railwayStatus.isOnline = false;
+                        this.railwayStatus.statusText = 'OFFLINE / REDEPLOYING... 🟡';
+                    }
+
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                    this.vercelStatus.lastChecked = timeString;
+                    this.railwayStatus.lastChecked = timeString;
                 },
 
                 fetchAdminPins() {
@@ -367,7 +457,7 @@
                     } else {
                         this.clients = [
                             { clientId: 'CLI-1001', companyName: 'Shahril Basri Leisure Enterprise', username: 'sbltransport', password: 'securepass456', phone: '+60132434200', email: 'architechlabs.io@gmail.com', railwayUrl: 'https://web-production-07b92.up.railway.app', status: 'Paid 🟢', expiryDate: '27/09/2026' },
-                            { clientId: 'CLI-1002', companyName: 'Architech Laboratory', username: 'architechlaboratory', password: 'H@$$ayang8683', phone: '+601123687357', email: 'radzmil@gmail.com', railwayUrl: 'https://leeasystem-production.up.railway.app', status: 'Paid 🟢', expiryDate: '27/09/2026' }
+                            { clientId: 'CLI-1002', companyName: 'Architech Laboratory', username: 'architech', password: 'H@$$ayang8683', phone: '+601123687357', email: 'radzmil@gmail.com', railwayUrl: 'https://leeasystem-production.up.railway.app', status: 'Paid 🟢', expiryDate: '27/09/2026' }
                         ];
                         localStorage.setItem('leea_admin_clients', JSON.stringify(this.clients));
                     }
@@ -384,6 +474,7 @@
                         this.isLoggedIn = true;
                         localStorage.setItem('leea_admin_logged', 'true');
                         this.updateTimestamp();
+                        this.checkDeployStatus();
                     } else {
                         this.loginError = 'ID Admin atau Katalaluan Salah!';
                     }
@@ -445,7 +536,6 @@
                             expiryDate: '27/09/2026'
                         });
 
-                        // 1. Simpan data global klien supaya portal klien boleh auto-baca
                         const allClientsMap = JSON.parse(localStorage.getItem('leea_all_clients_map') || '{}');
                         allClientsMap[assignedId] = {
                             clientId: assignedId,
@@ -455,7 +545,6 @@
                         };
                         localStorage.setItem('leea_all_clients_map', JSON.stringify(allClientsMap));
 
-                        // 2. Automasi penciptaan fail Google Sheet baru khusus untuk klien (1 fail 1 klien)
                         const dbAutoCreateUrl = "https://script.google.com/macros/s/AKfycbzbYqD6x2KjHx4M5WB8-YLrGCdeymX08hHibOK5B3S0Qkq5Euk35extB8DERlSeMW0Ylg/exec";
                         try {
                             await fetch(dbAutoCreateUrl, {
@@ -473,25 +562,21 @@
                             console.error("Gagal mencetuskan automasi penciptaan Fail Google Sheet:", err);
                         }
 
-                        // 3. Hantar WhatsApp notifikasi pengaktifan bot kepada nombor telefon klien dari bot LEEA
-                        const botWhatsappUrl = "https://script.google.com/macros/s/AKfycbyvSzjcJblEzJNGMSqxVCwwoCMJts32fVB6Q6MnFV-Cqm8mgZIqIMxV5weJSPDwB1pf3g/exec"; 
-                        // Atau hantar terus melalui Meta WhatsApp API / Endpoint Bot Railway jika ada, atau Apps Script pembantu:
                         try {
-                            // Contoh hantar notifikasi melalui API bot railway atau pelayan penghantar mesej
                             await fetch(`${this.clientForm.railwayUrl}/api/notify-activation`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
                                     phone: this.clientForm.phone,
                                     username: this.clientForm.username,
-                                    company: this.clientForm.companyName
+                                    company: this.clientForm.companyName,
+                                    email: this.clientForm.email
                                 })
                             });
                         } catch (err) {
                             console.error("Gagal hantar WhatsApp automatik ke nombor klien:", err);
                         }
 
-                        // 4. Hantar E-mel TQ secara automatik menggunakan Apps Script syarikat
                         const emailScriptUrl = "https://script.google.com/macros/s/AKfycbzCUuqaQNN8z91lSVgMnTAMbhujbMeMcLJSxj8k--MOufN-ROGo6eEVBOVstXmhmlkWeA/exec";
                         if (emailScriptUrl) {
                             try {

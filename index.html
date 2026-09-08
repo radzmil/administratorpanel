@@ -188,7 +188,8 @@
                             <thead>
                                 <tr class="bg-gray-950/80 text-gray-400 uppercase border-b border-gray-800">
                                     <th class="p-4">Client ID</th>
-                                    <th class="p-4">Username / Klien</th>
+                                    <th class="p-4">Nama Syarikat</th>
+                                    <th class="p-4">Username Login</th>
                                     <th class="p-4">Password</th>
                                     <th class="p-4">Telefon & E-mel</th>
                                     <th class="p-4">Railway Bot URL</th>
@@ -200,7 +201,8 @@
                                 <template x-for="(client, index) in clients" :key="index">
                                     <tr class="hover:bg-gray-800/30 transition">
                                         <td class="p-4 font-bold text-blue-400" x-text="client.clientId"></td>
-                                        <td class="p-4 font-bold text-white" x-text="client.username"></td>
+                                        <td class="p-4 font-bold text-white" x-text="client.companyName || client.username"></td>
+                                        <td class="p-4 font-bold text-indigo-300" x-text="client.username"></td>
                                         <td class="p-4"><code class="px-2 py-1 bg-gray-950 border border-gray-800 rounded text-gray-300" x-text="client.password || '-'"></code></td>
                                         <td class="p-4 text-[11px] text-gray-400">
                                             <div x-text="client.phone || '-'"></div>
@@ -231,16 +233,20 @@
                 </div>
                 <form @submit.prevent="saveClient()" class="p-6 space-y-4 font-mono text-xs">
                     <div>
-                        <label class="block uppercase text-blue-400 mb-1">Nama Syarikat / Username</label>
-                        <input type="text" x-model="clientForm.username" required class="w-full px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:border-blue-500 focus:outline-none">
+                        <label class="block uppercase text-blue-400 mb-1">Nama Syarikat</label>
+                        <input type="text" x-model="clientForm.companyName" placeholder="Contoh: Shahril Basri Leisure Enterprise" required class="w-full px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:border-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block uppercase text-blue-400 mb-1">Username Login Klien</label>
+                        <input type="text" x-model="clientForm.username" placeholder="Contoh: sbltransport" required class="w-full px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:border-blue-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block uppercase text-blue-400 mb-1">Kata Laluan Klien</label>
                         <input type="text" x-model="clientForm.password" required class="w-full px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:border-blue-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block uppercase text-blue-400 mb-1">Nombor Telefon</label>
-                        <input type="text" x-model="clientForm.phone" placeholder="+60123456789" class="w-full px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:border-blue-500 focus:outline-none">
+                        <label class="block uppercase text-blue-400 mb-1">Nombor Telefon WhatsApp Klien</label>
+                        <input type="text" x-model="clientForm.phone" placeholder="+60123456789" required class="w-full px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:border-blue-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block uppercase text-blue-400 mb-1">E-mel Klien</label>
@@ -252,7 +258,7 @@
                     </div>
                     <div class="flex justify-end space-x-2 pt-4 border-t border-gray-800">
                         <button type="button" @click="showClientModal = false" class="px-4 py-2 bg-gray-800 text-gray-300 rounded-xl">Batal</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow glow-effect">Simpan & Hantar E-mel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow glow-effect">Simpan & Aktifkan Bot</button>
                     </div>
                 </form>
             </div>
@@ -280,7 +286,7 @@
                 showClientModal: false,
                 modalMode: 'add',
                 editIndex: null,
-                clientForm: { username: '', password: '', phone: '', email: '', railwayUrl: '' },
+                clientForm: { companyName: '', username: '', password: '', phone: '', email: '', railwayUrl: '' },
                 lastUpdatedTime: '',
 
                 init() {
@@ -360,8 +366,8 @@
                         this.clients = JSON.parse(saved);
                     } else {
                         this.clients = [
-                            { clientId: 'CLI-1001', username: 'sbltransport', password: 'securepass456', phone: '+60132434200', email: 'architechlabs.io@gmail.com', railwayUrl: 'https://web-production-07b92.up.railway.app', status: 'Paid 🟢', expiryDate: '27/09/2026' },
-                            { clientId: 'CLI-1002', username: 'architechlaboratory', password: 'H@$$ayang8683', phone: '+601123687357', email: 'radzmil@gmail.com', railwayUrl: 'https://leeasystem-production.up.railway.app', status: 'Paid 🟢', expiryDate: '27/09/2026' }
+                            { clientId: 'CLI-1001', companyName: 'Shahril Basri Leisure Enterprise', username: 'sbltransport', password: 'securepass456', phone: '+60132434200', email: 'architechlabs.io@gmail.com', railwayUrl: 'https://web-production-07b92.up.railway.app', status: 'Paid 🟢', expiryDate: '27/09/2026' },
+                            { clientId: 'CLI-1002', companyName: 'Architech Laboratory', username: 'architechlaboratory', password: 'H@$$ayang8683', phone: '+601123687357', email: 'radzmil@gmail.com', railwayUrl: 'https://leeasystem-production.up.railway.app', status: 'Paid 🟢', expiryDate: '27/09/2026' }
                         ];
                         localStorage.setItem('leea_admin_clients', JSON.stringify(this.clients));
                     }
@@ -396,10 +402,17 @@
                     if (mode === 'edit' && index !== null) {
                         this.editIndex = index;
                         const c = this.clients[index];
-                        this.clientForm = { username: c.username, password: c.password, phone: c.phone, email: c.email, railwayUrl: c.railwayUrl };
+                        this.clientForm = { 
+                            companyName: c.companyName || c.username, 
+                            username: c.username, 
+                            password: c.password, 
+                            phone: c.phone, 
+                            email: c.email, 
+                            railwayUrl: c.railwayUrl 
+                        };
                     } else {
                         this.editIndex = null;
-                        this.clientForm = { username: '', password: '', phone: '', email: '', railwayUrl: '' };
+                        this.clientForm = { companyName: '', username: '', password: '', phone: '', email: '', railwayUrl: '' };
                     }
                     this.showClientModal = true;
                 },
@@ -409,6 +422,7 @@
                     let cleanUsername = this.clientForm.username.toLowerCase().replace(/[^a-z0-9]/g, '');
 
                     if (this.modalMode === 'edit' && this.editIndex !== null) {
+                        this.clients[this.editIndex].companyName = this.clientForm.companyName;
                         this.clients[this.editIndex].username = this.clientForm.username;
                         this.clients[this.editIndex].password = this.clientForm.password;
                         this.clients[this.editIndex].phone = this.clientForm.phone;
@@ -421,6 +435,7 @@
                         assignedId = `CLI-${nextId}`;
                         this.clients.push({
                             clientId: assignedId,
+                            companyName: this.clientForm.companyName,
                             username: this.clientForm.username,
                             password: this.clientForm.password,
                             phone: this.clientForm.phone,
@@ -435,6 +450,7 @@
                         allClientsMap[assignedId] = {
                             clientId: assignedId,
                             username: this.clientForm.username,
+                            companyName: this.clientForm.companyName,
                             railwayUrl: this.clientForm.railwayUrl
                         };
                         localStorage.setItem('leea_all_clients_map', JSON.stringify(allClientsMap));
@@ -449,7 +465,7 @@
                                 body: JSON.stringify({
                                     action: "create_client_db",
                                     client_key: cleanUsername,
-                                    client_name: this.clientForm.username,
+                                    client_name: this.clientForm.companyName,
                                     client_id: assignedId
                                 })
                             });
@@ -457,7 +473,25 @@
                             console.error("Gagal mencetuskan automasi penciptaan Fail Google Sheet:", err);
                         }
 
-                        // 3. Hantar E-mel TQ secara automatik menggunakan Apps Script syarikat
+                        // 3. Hantar WhatsApp notifikasi pengaktifan bot kepada nombor telefon klien dari bot LEEA
+                        const botWhatsappUrl = "https://script.google.com/macros/s/AKfycbyvSzjcJblEzJNGMSqxVCwwoCMJts32fVB6Q6MnFV-Cqm8mgZIqIMxV5weJSPDwB1pf3g/exec"; 
+                        // Atau hantar terus melalui Meta WhatsApp API / Endpoint Bot Railway jika ada, atau Apps Script pembantu:
+                        try {
+                            // Contoh hantar notifikasi melalui API bot railway atau pelayan penghantar mesej
+                            await fetch(`${this.clientForm.railwayUrl}/api/notify-activation`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    phone: this.clientForm.phone,
+                                    username: this.clientForm.username,
+                                    company: this.clientForm.companyName
+                                })
+                            });
+                        } catch (err) {
+                            console.error("Gagal hantar WhatsApp automatik ke nombor klien:", err);
+                        }
+
+                        // 4. Hantar E-mel TQ secara automatik menggunakan Apps Script syarikat
                         const emailScriptUrl = "https://script.google.com/macros/s/AKfycbzCUuqaQNN8z91lSVgMnTAMbhujbMeMcLJSxj8k--MOufN-ROGo6eEVBOVstXmhmlkWeA/exec";
                         if (emailScriptUrl) {
                             try {
@@ -468,6 +502,7 @@
                                     body: JSON.stringify({
                                         email: this.clientForm.email,
                                         username: this.clientForm.username,
+                                        companyName: this.clientForm.companyName,
                                         clientId: assignedId,
                                         password: this.clientForm.password
                                     })
@@ -477,7 +512,7 @@
                             }
                         }
 
-                        alert('Klien baru berjaya didaftarkan, fail DB Sheet berasingan dijana & e-mel TQ dihantar!');
+                        alert('Klien baru berjaya didaftarkan, fail DB Sheet berasingan dijana, WhatsApp notifikasi & e-mel TQ dihantar!');
                     }
                     this.saveClients();
                     this.showClientModal = false;

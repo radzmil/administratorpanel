@@ -200,15 +200,17 @@
                         </template>
                     </div>
 
-                    <form @submit.prevent="addNewAdminPin()" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-                        <div>
-                            <input type="text" x-model="newAdminName" placeholder="Nama Pegawai Baru" required class="w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-xl text-xs font-mono text-blue-100 focus:outline-none">
+                    <form @submit.prevent="addNewAdminPin()" class="space-y-3 pt-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <input type="text" x-model="newAdminName" placeholder="Nama Pegawai Baru" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-xs font-mono text-blue-100 focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <input type="password" maxlength="4" x-model="newAdminPinCode" placeholder="Kod PIN 4 Digit" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-xs font-mono text-blue-100 focus:outline-none focus:border-blue-500">
+                            </div>
                         </div>
                         <div>
-                            <input type="password" maxlength="4" x-model="newAdminPinCode" placeholder="Kod 4 Digit Baru" required class="w-full px-3 py-2 bg-gray-950 border border-gray-800 rounded-xl text-xs font-mono text-blue-100 focus:outline-none">
-                        </div>
-                        <div>
-                            <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold rounded-xl shadow">Tambah Kod Akses</button>
+                            <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold rounded-xl shadow transition">Tambah Kod Akses</button>
                         </div>
                     </form>
                 </div>
@@ -328,14 +330,12 @@
                 clientForm: { companyName: '', username: '', password: '', phone: '', email: '', railwayUrl: '' },
                 lastUpdatedTime: '',
                 
-                // Status Deploy Vercel Portal
                 vercelStatus: {
                     isOnline: false,
                     statusText: 'Menyemak...',
                     lastChecked: '-'
                 },
 
-                // Status Server Railway
                 railwayStatus: {
                     isOnline: false,
                     statusText: 'Menyemak...',
@@ -361,7 +361,6 @@
                     this.vercelStatus.statusText = 'Menyemak Vercel...';
                     this.railwayStatus.statusText = 'Menyemak Railway...';
 
-                    // 1. Semak Vercel Portal (https://leea-portal.vercel.app)
                     try {
                         const vercelRes = await fetch('https://leea-portal.vercel.app', { method: 'GET', mode: 'no-cors' });
                         this.vercelStatus.isOnline = true;
@@ -371,7 +370,6 @@
                         this.vercelStatus.statusText = 'SEDANG DEPLOY / OFFLINE 🟡';
                     }
 
-                    // 2. Semak Railway Backend (https://leeasystem-production.up.railway.app)
                     const targetUrl = (this.clients.length > 0 && this.clients[0].railwayUrl) ? this.clients[0].railwayUrl : 'https://leeasystem-production.up.railway.app';
                     try {
                         const railwayRes = await fetch(targetUrl, { method: 'GET', mode: 'cors' });

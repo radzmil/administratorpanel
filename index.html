@@ -302,7 +302,6 @@
                     if (saved) {
                         this.authorizedPins = JSON.parse(saved);
                     } else {
-                        // Default Superadmin pin
                         this.authorizedPins = [
                             { name: 'Superadmin Utama', pin: '7357' }
                         ];
@@ -407,6 +406,8 @@
 
                 async saveClient() {
                     let assignedId = '';
+                    let cleanUsername = this.clientForm.username.toLowerCase().replace(/[^a-z0-9]/g, '');
+
                     if (this.modalMode === 'edit' && this.editIndex !== null) {
                         this.clients[this.editIndex].username = this.clientForm.username;
                         this.clients[this.editIndex].password = this.clientForm.password;
@@ -429,7 +430,7 @@
                             expiryDate: '27/09/2026'
                         });
 
-                        // 1. Simpan data global klien supaya portal klien (leea-portal.vercel.app) boleh auto-baca
+                        // 1. Simpan data global klien supaya portal klien boleh auto-baca
                         const allClientsMap = JSON.parse(localStorage.getItem('leea_all_clients_map') || '{}');
                         allClientsMap[assignedId] = {
                             clientId: assignedId,
@@ -438,7 +439,25 @@
                         };
                         localStorage.setItem('leea_all_clients_map', JSON.stringify(allClientsMap));
 
-                        // 2. Hantar E-mel TQ secara automatik menggunakan Apps Script syarikat
+                        // 2. Automasi penciptaan pangkalan data sheet khusus klien melalui Apps Script baharu
+                        const dbAutoCreateUrl = "https://script.google.com/macros/s/AKfycbwzZ1qKKiui29PRwm7pmcb5F50QcQxSc7eJyyvaZGHpGv-be-Ti2YjU8whrLyI2fi6t/exec";
+                        try {
+                            await fetch(dbAutoCreateUrl, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    action: "create_client_db",
+                                    client_key: cleanUsername,
+                                    client_name: this.clientForm.username,
+                                    client_id: assignedId
+                                })
+                            });
+                        } catch (err) {
+                            console.error("Gagal mencetuskan automasi penciptaan DB Sheet:", err);
+                        }
+
+                        // 3. Hantar E-mel TQ secara automatik menggunakan Apps Script syarikat
                         const emailScriptUrl = "https://script.google.com/macros/s/AKfycbzCUuqaQNN8z91lSVgMnTAMbhujbMeMcLJSxj8k--MOufN-ROGo6eEVBOVstXmhmlkWeA/exec";
                         if (emailScriptUrl) {
                             try {
@@ -458,7 +477,7 @@
                             }
                         }
 
-                        alert('Klien baru berjaya didaftarkan, pangkalan data diselaraskan & e-mel TQ dihantar!');
+                        alert('Klien baru berjaya didaftarkan, tab DB sheet khusus dijana & e-mel TQ dihantar!');
                     }
                     this.saveClients();
                     this.showClientModal = false;

@@ -439,8 +439,8 @@
                         };
                         localStorage.setItem('leea_all_clients_map', JSON.stringify(allClientsMap));
 
-                        // 2. Automasi penciptaan pangkalan data sheet khusus klien melalui Apps Script baharu
-                        const dbAutoCreateUrl = "https://script.google.com/macros/s/AKfycbwzZ1qKKiui29PRwm7pmcb5F50QcQxSc7eJyyvaZGHpGv-be-Ti2YjU8whrLyI2fi6t/exec";
+                        // 2. Automasi penciptaan fail Google Sheet baru khusus untuk klien (1 fail 1 klien)
+                        const dbAutoCreateUrl = "https://script.google.com/macros/s/AKfycbzbYqD6x2KjHx4M5WB8-YLrGCdeymX08hHibOK5B3S0Qkq5Euk35extB8DERlSeMW0Ylg/exec";
                         try {
                             await fetch(dbAutoCreateUrl, {
                                 method: 'POST',
@@ -454,7 +454,7 @@
                                 })
                             });
                         } catch (err) {
-                            console.error("Gagal mencetuskan automasi penciptaan DB Sheet:", err);
+                            console.error("Gagal mencetuskan automasi penciptaan Fail Google Sheet:", err);
                         }
 
                         // 3. Hantar E-mel TQ secara automatik menggunakan Apps Script syarikat
@@ -477,7 +477,7 @@
                             }
                         }
 
-                        alert('Klien baru berjaya didaftarkan, tab DB sheet khusus dijana & e-mel TQ dihantar!');
+                        alert('Klien baru berjaya didaftarkan, fail DB Sheet berasingan dijana & e-mel TQ dihantar!');
                     }
                     this.saveClients();
                     this.showClientModal = false;

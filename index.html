@@ -190,9 +190,9 @@
                     </div>
                 </div>
 
-                <!-- DITUKAR TEMPAT: Realtime LEEA Bot (Webhook) diletakkan di atas sebelah Kotak Unlock Khas -->
+                <!-- DITUKAR POSISI: KOTAK KUNING (REALTIME CHAT) DITUKAR KE ATAS, KOTAK MERAH (HANTAR MESEJ INBOX) DITUKAR KE BAWAH -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Kiri: Realtime LEEA Bot & Human Touch (Ditukar ke sebelah kiri) -->
+                    <!-- Kiri Atas (Kotak Kuning asal): Realtime LEEA Bot & Human Touch -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between">
                         <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                             <div class="flex items-center space-x-2">
@@ -250,7 +250,7 @@
                         </div>
                     </div>
 
-                    <!-- Kanan: Pengurusan Kod Unlock Khas (Ditukar ke sebelah kanan) -->
+                    <!-- Kanan Atas: Pengurusan Kod Unlock Khas -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between">
                         <div class="space-y-4">
                             <h3 class="font-bold text-sm text-blue-300">Pengurusan Kod Unlock Khas (Pegawai / Admin Baru)</h3>
@@ -286,7 +286,7 @@
                     </div>
                 </div>
 
-                <!-- DITUKAR TEMPAT: KOTAK HANTAR MESEJ KEPADA KLIEN (DILETAKKAN DI BAWAH) -->
+                <!-- KOTAK BAWAH (Kotak Merah asal): HANTAR MESEJ / NOTIFIKASI KEPADA KLIEN (INBOX) -->
                 <div class="bg-gray-900 p-6 rounded-2xl cyber-border space-y-4">
                     <div class="border-b border-gray-800 pb-3 flex items-center space-x-2">
                         <i class="fa-solid fa-paper-plane text-blue-400"></i>
@@ -321,7 +321,7 @@
                     </form>
                 </div>
 
-                <!-- BAHAGIAN PENGURUSAN AGEN AFFILIATE & PAYOUT KOMISEN -->
+                <!-- PENGURUSAN AGEN AFFILIATE & PAYOUT KOMISEN -->
                 <div class="bg-gray-900 rounded-2xl cyber-border overflow-hidden shadow-xl">
                     <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950">
                         <div>
@@ -928,7 +928,7 @@
                     this.showClientModal = false;
                 },
 
-                approveRenewal(index} {
+                approveRenewal(index) {
                     this.clients[index].status = 'Paid 🟢';
                     this.saveClients();
                     alert('Status langganan klien diperbaharui!');

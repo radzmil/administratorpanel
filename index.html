@@ -186,7 +186,7 @@
                     </div>
                 </div>
 
-                <!-- REALTIME CHAT (LEEA BOT) - MASA MENGIKUT WAKTU PIAWAI MALAYSIA PERSIS WHATSAPP -->
+                <!-- REALTIME CHAT (LEEA BOT) DENGAN CAP WAKTU MALAYSIA -->
                 <div class="bg-gray-900 p-6 rounded-2xl cyber-border shadow-md space-y-4">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                         <div class="flex items-center space-x-2">
@@ -249,7 +249,7 @@
                     </div>
 
                     <div class="text-xs text-gray-400 text-right font-semibold pt-1">
-                        URL: https://leeasystem-production.up.railway.app
+                        URL: https://leeasystem-production-47d7.up.railway.app
                     </div>
                 </div>
 
@@ -819,8 +819,9 @@
                         this.vercelStatus.statusText = 'SEDANG DEPLOY / OFFLINE 🟡';
                     }
 
+                    const targetUrl = 'https://leeasystem-production-47d7.up.railway.app';
                     try {
-                        await fetch('https://leeasystem-production.up.railway.app', { method: 'GET', mode: 'no-cors' });
+                        await fetch(targetUrl, { method: 'GET', mode: 'no-cors' });
                         this.railwayStatus.isOnline = true;
                         this.railwayStatus.statusText = 'ONLINE & ACTIVE 🟢';
                     } catch (err) {

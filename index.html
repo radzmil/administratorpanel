@@ -190,9 +190,44 @@
                     </div>
                 </div>
 
-                <!-- DITUKAR POSISI: KOTAK KUNING (REALTIME CHAT) DITUKAR KE ATAS, KOTAK MERAH (HANTAR MESEJ INBOX) DITUKAR KE BAWAH -->
+                <!-- KOTAK HANTAR MESEJ / NOTIFIKASI KEPADA KLIEN (INBOX) - DITUKAR NAIK KE ATAS (POSISI KOTAK KUNING) -->
+                <div class="bg-gray-900 p-6 rounded-2xl cyber-border space-y-4">
+                    <div class="border-b border-gray-800 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-paper-plane text-blue-400"></i>
+                        <h3 class="font-bold text-sm text-blue-300 uppercase">Hantar Mesej / Notifikasi kepada Klien (Inbox)</h3>
+                    </div>
+
+                    <form @submit.prevent="sendAdminBroadcastMessage()" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block uppercase text-blue-400 mb-1">Pilih Penerima Klien</label>
+                                <select x-model="broadcastForm.target" class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500">
+                                    <option value="ALL">📢 Semua Klien (All Clients)</option>
+                                    <template x-for="client in clients" :key="client.clientId">
+                                        <option :value="client.username" x-text="client.clientId + ' - ' + (client.companyName || client.username)"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block uppercase text-blue-400 mb-1">Tajuk / Pengirim</label>
+                                <input type="text" x-model="broadcastForm.senderTitle" placeholder="Contoh: Master Administrator" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block uppercase text-blue-400 mb-1">Kandungan Mesej</label>
+                            <textarea x-model="broadcastForm.content" rows="3" placeholder="Taip mesej atau pengumuman sistem di sini..." required class="w-full p-3 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow glow-effect transition">Hantar Mesej Klien</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- REALTIME LEEA BOT (WEBHOOK) & KOD UNLOCK KHAS -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Kiri Atas (Kotak Kuning asal): Realtime LEEA Bot & Human Touch -->
+                    <!-- Kiri: Realtime LEEA Bot & Human Touch (Diturunkan ke bawah menggantikan kotak merah) -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between">
                         <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                             <div class="flex items-center space-x-2">
@@ -250,7 +285,7 @@
                         </div>
                     </div>
 
-                    <!-- Kanan Atas: Pengurusan Kod Unlock Khas -->
+                    <!-- Kanan: Pengurusan Kod Unlock Khas -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between">
                         <div class="space-y-4">
                             <h3 class="font-bold text-sm text-blue-300">Pengurusan Kod Unlock Khas (Pegawai / Admin Baru)</h3>
@@ -284,41 +319,6 @@
                             </div>
                         </form>
                     </div>
-                </div>
-
-                <!-- KOTAK BAWAH (Kotak Merah asal): HANTAR MESEJ / NOTIFIKASI KEPADA KLIEN (INBOX) -->
-                <div class="bg-gray-900 p-6 rounded-2xl cyber-border space-y-4">
-                    <div class="border-b border-gray-800 pb-3 flex items-center space-x-2">
-                        <i class="fa-solid fa-paper-plane text-blue-400"></i>
-                        <h3 class="font-bold text-sm text-blue-300 uppercase">Hantar Mesej / Notifikasi kepada Klien (Inbox)</h3>
-                    </div>
-
-                    <form @submit.prevent="sendAdminBroadcastMessage()" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block uppercase text-blue-400 mb-1">Pilih Penerima Klien</label>
-                                <select x-model="broadcastForm.target" class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500">
-                                    <option value="ALL">📢 Semua Klien (All Clients)</option>
-                                    <template x-for="client in clients" :key="client.clientId">
-                                        <option :value="client.username" x-text="client.clientId + ' - ' + (client.companyName || client.username)"></option>
-                                    </template>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block uppercase text-blue-400 mb-1">Tajuk / Pengirim</label>
-                                <input type="text" x-model="broadcastForm.senderTitle" placeholder="Contoh: Master Administrator" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block uppercase text-blue-400 mb-1">Kandungan Mesej</label>
-                            <textarea x-model="broadcastForm.content" rows="3" placeholder="Taip mesej atau pengumuman sistem di sini..." required class="w-full p-3 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
-                        </div>
-
-                        <div class="flex justify-end">
-                            <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow glow-effect transition">Hantar Mesej Klien</button>
-                        </div>
-                    </form>
                 </div>
 
                 <!-- PENGURUSAN AGEN AFFILIATE & PAYOUT KOMISEN -->

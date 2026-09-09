@@ -485,42 +485,39 @@
                     alert(this.humanTouchActive ? 'Mod Human Touch diaktifkan!' : 'Mod Human Touch ditutup.');
                 },
 
-                sendAdminBroadcastMessage() {
+                async sendAdminBroadcastMessage() {
                     if (!this.broadcastForm.content.trim()) return;
 
                     const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
-                    const newMsg = {
-                        senderTitle: this.broadcastForm.senderTitle,
-                        date: nowString,
-                        content: this.broadcastForm.content
+                    const scriptUrl = "https://script.google.com/macros/s/AKfycbwLe9yliZsciyUaCyGb6_53_YKPburoxP_uei-tnDJ_BbLSyvbFqKVb10lBl41ua2Se/exec";
+
+                    const payload = {
+                        timestamp: nowString,
+                        type: 'inbox',
+                        sender: this.broadcastForm.senderTitle,
+                        phone: '-',
+                        role: 'admin',
+                        message: this.broadcastForm.content,
+                        targetClient: this.broadcastForm.target
                     };
 
-                    let allInbox = {};
                     try {
-                        allInbox = JSON.parse(localStorage.getItem('leea_admin_inbox') || '{}');
-                    } catch(e) {
-                        allInbox = {};
-                    }
-
-                    if (this.broadcastForm.target === 'ALL') {
-                        this.clients.forEach(c => {
-                            if (!allInbox[c.username]) allInbox[c.username] = [];
-                            allInbox[c.username].unshift(newMsg);
+                        await fetch(scriptUrl, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
                         });
-                        alert('Mesej berjaya dihantar kepada SEMUA KLIEN!');
-                    } else {
-                        const targetUser = this.broadcastForm.target;
-                        if (!allInbox[targetUser]) allInbox[targetUser] = [];
-                        allInbox[targetUser].unshift(newMsg);
-                        alert('Mesej berjaya dihantar kepada klien: ' + targetUser);
+                        alert('Mesej berjaya dihantar ke Google Sheets untuk klien!');
+                        this.broadcastForm.content = '';
+                    } catch (err) {
+                        console.error("Gagal hantar mesej:", err);
+                        alert('Ralat semasa menghantar mesej.');
                     }
-
-                    localStorage.setItem('leea_admin_inbox', JSON.stringify(allInbox));
-                    this.broadcastForm.content = '';
                 },
 
                 async fetchLiveChats() {
-                    const url = "https://script.google.com/macros/s/AKfycbyv6mxISC-5OJ_Cli3RcPAxQaMJvUSQx5wlyBvg7N2nSh4BBVle7UXimJp7jy94mEB_/exec?t=" + new Date().getTime();
+                    const url = "https://script.google.com/macros/s/AKfycbwLe9yliZsciyUaCyGb6_53_YKPburoxP_uei-tnDJ_BbLSyvbFqKVb10lBl41ua2Se/exec?t=" + new Date().getTime();
                     try {
                         const res = await fetch(url);
                         const data = await res.json();
@@ -529,6 +526,9 @@
                             let lastPhone = "601123687357";
 
                             data.data.forEach(row => {
+                                // Hanya ambil jenis chat
+                                if (row.type && row.type !== 'chat') return;
+
                                 let phone = row.phone ? String(row.phone).trim() : lastPhone;
                                 if (!phone || phone === "Unknown") phone = lastPhone;
                                 else lastPhone = phone;
@@ -539,7 +539,7 @@
                                 }
                                 if (row.message) {
                                     chatMap[cleanPhone].messages.push({
-                                        sender: row.sender || 'customer',
+                                        sender: row.role || 'customer',
                                         text: row.message,
                                         time: row.timestamp ? String(row.timestamp).substring(11, 16) : ''
                                     });
@@ -558,15 +558,40 @@
                     }
                 },
 
-                sendAdminReply() {
+                async sendAdminReply() {
                     if (!this.adminReplyText.trim() || !this.activeChat) return;
                     if (!this.humanTouchActive) {
                         alert('Sila aktifkan "Human Touch" terlebih dahulu!');
                         return;
                     }
-                    this.activeChat.messages.push({ sender: 'human', text: this.adminReplyText, time: 'Now' });
-                    this.activeChat.lastMessage = this.adminReplyText;
-                    this.adminReplyText = '';
+
+                    const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
+                    const scriptUrl = "https://script.google.com/macros/s/AKfycbwLe9yliZsciyUaCyGb6_53_YKPburoxP_uei-tnDJ_BbLSyvbFqKVb10lBl41ua2Se/exec";
+
+                    const payload = {
+                        timestamp: nowString,
+                        type: 'chat',
+                        sender: 'Admin',
+                        phone: this.activeChat.phone,
+                        role: 'agent',
+                        message: this.adminReplyText,
+                        targetClient: 'ALL'
+                    };
+
+                    try {
+                        await fetch(scriptUrl, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        this.activeChat.messages.push({ sender: 'agent', text: this.adminReplyText, time: 'Now' });
+                        this.activeChat.lastMessage = this.adminReplyText;
+                        this.adminReplyText = '';
+                    } catch(err) {
+                        console.error("Gagal hantar balasan:", err);
+                    }
                 },
 
                 async checkDeployStatus() {

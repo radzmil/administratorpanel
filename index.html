@@ -136,18 +136,18 @@
 
         <!-- FASA 3: Papan Pemuka Admin (Master Dashboard) -->
         <template x-if="isUnlocked && isLoggedIn">
-            <div class="space-y-6">
+            <div class="space-y-6 font-mono text-xs">
                 <div class="bg-gradient-to-r from-blue-900/50 via-indigo-900/40 to-gray-900 rounded-2xl p-6 text-white cyber-border glow-effect flex justify-between items-center">
                     <div>
                         <h1 class="text-2xl font-black text-white">Administrator Panel</h1>
-                        <p class="text-indigo-300 text-xs font-mono mt-1">Urus akaun klien, tetapan pelayan Railway, dan hantar e-mel TQ automatik.</p>
-                        <p class="text-xs text-blue-400 mt-2 font-mono">
+                        <p class="text-indigo-300 text-xs mt-1">Urus akaun klien, tetapan pelayan, dan pengurusan pembayaran komisen affiliate.</p>
+                        <p class="text-xs text-blue-400 mt-2">
                             <i class="fa-solid fa-clock-rotate-left mr-1"></i> Kemaskini Terkini: <span x-text="lastUpdatedTime"></span>
                         </p>
                     </div>
                     <div class="bg-gray-900/80 cyber-border px-4 py-2.5 rounded-xl text-right">
-                        <span class="block text-[10px] font-mono text-gray-400 uppercase">Jumlah Klien Aktif</span>
-                        <span class="font-bold text-lg font-mono text-blue-300" x-text="clients.length"></span>
+                        <span class="block text-[10px] text-gray-400 uppercase">Jumlah Klien Aktif</span>
+                        <span class="font-bold text-lg text-blue-300" x-text="clients.length"></span>
                     </div>
                 </div>
 
@@ -156,14 +156,14 @@
                     <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                         <div class="flex items-center space-x-2">
                             <i class="fa-solid fa-cloud-arrow-up text-blue-400"></i>
-                            <h3 class="font-bold text-sm font-mono text-blue-300">Vercel & Railway Deploy Status Monitor</h3>
+                            <h3 class="font-bold text-sm text-blue-300">Vercel & Railway Deploy Status Monitor</h3>
                         </div>
-                        <button @click="checkDeployStatus()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs rounded-xl shadow transition">
+                        <button @click="checkDeployStatus()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-xl shadow transition">
                             <i class="fa-solid fa-rotate mr-1"></i> Semak Status Deploy
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                         <div class="p-4 bg-gray-950 rounded-xl cyber-border flex flex-col justify-between">
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-400 text-[10px] uppercase">Portal Klien (Vercel Server)</span>
@@ -190,15 +190,78 @@
                     </div>
                 </div>
 
+                <!-- BAHAGIAN PENGURUSAN AGEN AFFILIATE & PAYOT KOMISEN -->
+                <div class="bg-gray-900 rounded-2xl cyber-border overflow-hidden shadow-xl">
+                    <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950">
+                        <div>
+                            <h3 class="font-bold text-sm text-blue-300"><i class="fa-solid fa-handshake-angle mr-2"></i> Senarai Agen Affiliate & Pembayaran Komisen (3%)</h3>
+                            <p class="text-[10px] text-gray-400 mt-0.5">Semak baki e-wallet klien, maklumat akaun bank/DuitNow, dan laksanakan pembayaran komisen.</p>
+                        </div>
+                        <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-bold" x-text="'Jumlah Agen: ' + getAffiliateAgents().length"></span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-950/80 text-gray-400 uppercase border-b border-gray-800 text-[11px]">
+                                    <th class="p-4">Username / Klien</th>
+                                    <th class="p-4">Status Agen</th>
+                                    <th class="p-4">Baki E-Wallet</th>
+                                    <th class="p-4">Maklumat Bank / DuitNow</th>
+                                    <th class="p-4">Jumlah Rujukan</th>
+                                    <th class="p-4 text-center">Tindakan Payout Komisen</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/60">
+                                <template x-for="client in clients" :key="client.username">
+                                    <tr class="hover:bg-gray-800/30 transition">
+                                        <td class="p-4 font-bold text-white">
+                                            <div x-text="client.companyName || client.username"></div>
+                                            <span class="text-[10px] text-blue-400" x-text="'@' + client.username"></span>
+                                        </td>
+                                        <td class="p-4">
+                                            <span class="px-2.5 py-1 text-[10px] font-bold rounded-full" :class="getClientAffiliateData(client.username).isAgent ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-gray-800 text-gray-400'" x-text="getClientAffiliateData(client.username).isAgent ? 'AKTIF 🟢' : 'BELUM DAFTAR'"></span>
+                                        </td>
+                                        <td class="p-4 font-bold text-emerald-400" x-text="'RM ' + getClientAffiliateData(client.username).walletBalance.toFixed(2)"></td>
+                                        <td class="p-4 text-[11px] text-gray-300">
+                                            <template x-if="getClientBankData(client.username).accountNo">
+                                                <div>
+                                                    <strong class="text-blue-300" x-text="getClientBankData(client.username).bankName"></strong><br>
+                                                    <span x-text="'No: ' + getClientBankData(client.username).accountNo"></span><br>
+                                                    <span class="text-gray-400" x-text="'Nama: ' + getClientBankData(client.username).accountHolder"></span>
+                                                </div>
+                                            </template>
+                                            <template x-if="!getClientBankData(client.username).accountNo">
+                                                <span class="text-gray-500 italic">Belum tetapkan akaun</span>
+                                            </template>
+                                        </td>
+                                        <td class="p-4 font-bold text-indigo-300" x-text="getClientAffiliateData(client.username).totalReferrals + ' orang'"></td>
+                                        <td class="p-4 text-center">
+                                            <template x-if="getClientAffiliateData(client.username).isAgent && getClientAffiliateData(client.username).walletBalance > 0">
+                                                <button @click="processAffiliatePayout(client)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow transition">
+                                                    <i class="fa-solid fa-money-bill-transfer mr-1"></i> Bayar Payout Komisen
+                                                </button>
+                                            </template>
+                                            <template x-if="!getClientAffiliateData(client.username).isAgent || getClientAffiliateData(client.username).walletBalance <= 0">
+                                                <span class="text-gray-500 text-[10px]">Tiada Tindakan</span>
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Bahagian Pengurusan Kod Akses & Realtime LEEA Bot -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <!-- Kiri: Pengurusan Kod Unlock Khas -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between">
                         <div class="space-y-4">
-                            <h3 class="font-bold text-sm font-mono text-blue-300">Pengurusan Kod Unlock Khas (Pegawai / Admin Baru)</h3>
+                            <h3 class="font-bold text-sm text-blue-300">Pengurusan Kod Unlock Khas (Pegawai / Admin Baru)</h3>
                             <div class="grid grid-cols-1 gap-3 max-h-[160px] overflow-y-auto">
                                 <template x-for="(adminItem, idx) in authorizedPins" :key="idx">
-                                    <div class="p-3 bg-gray-950 border border-gray-800 rounded-xl flex justify-between items-center font-mono text-xs">
+                                    <div class="p-3 bg-gray-950 border border-gray-800 rounded-xl flex justify-between items-center text-xs">
                                         <div>
                                             <span class="text-gray-400 block text-[10px]">NAMA / JAWATAN:</span>
                                             <span class="text-white font-bold" x-text="adminItem.name"></span>
@@ -215,20 +278,20 @@
                         <form @submit.prevent="addNewAdminPin()" class="space-y-3 pt-2">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                    <input type="text" x-model="newAdminName" placeholder="Nama Pegawai Baru" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-xs font-mono text-blue-100 focus:outline-none focus:border-blue-500">
+                                    <input type="text" x-model="newAdminName" placeholder="Nama Pegawai Baru" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-xs text-blue-100 focus:outline-none focus:border-blue-500">
                                 </div>
                                 <div>
-                                    <input type="password" maxlength="4" x-model="newAdminPinCode" placeholder="PIN 4 Digit" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-xs font-mono text-blue-100 focus:outline-none focus:border-blue-500">
+                                    <input type="password" maxlength="4" x-model="newAdminPinCode" placeholder="PIN 4 Digit" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-xs text-blue-100 focus:outline-none focus:border-blue-500">
                                 </div>
                             </div>
                             <div>
-                                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold rounded-xl shadow transition">Tambah Kod Akses</button>
+                                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow transition">Tambah Kod Akses</button>
                             </div>
                         </form>
                     </div>
 
                     <!-- Kanan: Realtime LEEA Bot & Human Touch -->
-                    <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between font-mono">
+                    <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between">
                         <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                             <div class="flex items-center space-x-2">
                                 <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -287,7 +350,7 @@
                 </div>
 
                 <!-- KOTAK HANTAR MESEJ KEPADA KLIEN -->
-                <div class="bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 font-mono text-xs">
+                <div class="bg-gray-900 p-6 rounded-2xl cyber-border space-y-4">
                     <div class="border-b border-gray-800 pb-3 flex items-center space-x-2">
                         <i class="fa-solid fa-paper-plane text-blue-400"></i>
                         <h3 class="font-bold text-sm text-blue-300 uppercase">Hantar Mesej / Notifikasi kepada Klien (Inbox)</h3>
@@ -324,16 +387,16 @@
                 <!-- Jadual Senarai Klien -->
                 <div class="bg-gray-900 rounded-2xl cyber-border overflow-hidden shadow-xl">
                     <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950">
-                        <h3 class="font-bold text-sm font-mono text-blue-300">Senarai Akaun Klien & ID Neural</h3>
-                        <button @click="openClientModal('add')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl shadow transition glow-effect">
+                        <h3 class="font-bold text-sm text-blue-300">Senarai Akaun Klien & ID Neural</h3>
+                        <button @click="openClientModal('add')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow transition glow-effect">
                             <i class="fa-solid fa-user-plus mr-1"></i> Tambah Klien Baru
                         </button>
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse font-mono text-xs">
+                        <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="bg-gray-950/80 text-gray-400 uppercase border-b border-gray-800">
+                                <tr class="bg-gray-950/80 text-gray-400 uppercase border-b border-gray-800 text-[11px]">
                                     <th class="p-4">Client ID</th>
                                     <th class="p-4">Nama Syarikat</th>
                                     <th class="p-4">Username Login</th>
@@ -375,10 +438,10 @@
         <div x-show="showClientModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" style="display: none;">
             <div class="bg-gray-900 w-full max-w-md rounded-2xl shadow-2xl cyber-border overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-950">
-                    <h3 class="font-bold text-sm font-mono text-blue-300" x-text="modalMode === 'edit' ? 'Kemaskini Maklumat Klien' : 'Tambah Klien Baru & Hantar E-mel TQ'"></h3>
+                    <h3 class="font-bold text-sm text-blue-300" x-text="modalMode === 'edit' ? 'Kemaskini Maklumat Klien' : 'Tambah Klien Baru & Hantar E-mel TQ'"></h3>
                     <button @click="showClientModal = false" class="text-gray-400 hover:text-red-400 text-lg p-2"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <form @submit.prevent="saveClient()" class="p-6 space-y-4 font-mono text-xs">
+                <form @submit.prevent="saveClient()" class="p-6 space-y-4 text-xs">
                     <div>
                         <label class="block uppercase text-blue-400 mb-1">Nama Syarikat</label>
                         <input type="text" x-model="clientForm.companyName" placeholder="Contoh: Shahril Basri Leisure Enterprise" required class="w-full px-4 py-2 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:border-blue-500 focus:outline-none">
@@ -478,6 +541,86 @@
                             this.fetchLiveChats();
                         }
                     }, 4000);
+                },
+
+                getClientAffiliateData(username) {
+                    const saved = localStorage.getItem('leea_affiliate_' + username);
+                    if (saved) {
+                        try {
+                            const parsed = JSON.parse(saved);
+                            return parsed.data || { isAgent: false, walletBalance: 0, totalReferrals: 0, totalEarned: 0 };
+                        } catch(e) {}
+                    }
+                    return { isAgent: false, walletBalance: 0, totalReferrals: 0, totalEarned: 0 };
+                },
+
+                getClientBankData(username) {
+                    const saved = localStorage.getItem('leea_affiliate_' + username);
+                    if (saved) {
+                        try {
+                            const parsed = JSON.parse(saved);
+                            return parsed.bank || { bankName: '', accountNo: '', accountHolder: '' };
+                        } catch(e) {}
+                    }
+                    return { bankName: '', accountNo: '', accountHolder: '' };
+                },
+
+                getAffiliateAgents() {
+                    return this.clients.filter(c => this.getClientAffiliateData(c.username).isAgent);
+                },
+
+                // Fungsi Proses Payout Komisen Affiliate & Hantar E-mel Otomatis
+                async processAffiliatePayout(client) {
+                    const affData = this.getClientAffiliateData(client.username);
+                    const bankData = this.getClientBankData(client.username);
+
+                    if (affData.walletBalance <= 0) {
+                        alert('Baki e-wallet klien ini adalah RM0.00.');
+                        return;
+                    }
+
+                    if (!bankData.accountNo) {
+                        alert('Klien ini belum menetapkan maklumat akaun bank/DuitNow.');
+                        return;
+                    }
+
+                    const payoutAmount = affData.walletBalance;
+
+                    if (confirm(`Sahkan pembayaran komisen sebanyak RM ${payoutAmount.toFixed(2)} kepada ${client.companyName || client.username} (${bankData.bankName} - ${bankData.accountNo})?`)) {
+                        // Tolak baki e-wallet klien kepada 0
+                        affData.walletBalance = 0;
+                        
+                        const saved = localStorage.getItem('leea_affiliate_' + client.username);
+                        let fullData = saved ? JSON.parse(saved) : {};
+                        fullData.data = affData;
+                        localStorage.setItem('leea_affiliate_' + client.username, JSON.stringify(fullData));
+
+                        // Hantar notifikasi pembayaran melalui e-mel menggunakan Google Apps Script Backup Endpoint
+                        const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
+                        const backupEndpointUrl = "https://script.google.com/macros/s/AKfycbzy5-i5e3KAD2UqLbvMtyyOymv9euf9Tq17h1iJjv3kGvLl5AUaWLU50nRIDsZVfGgX/exec";
+
+                        const emailPayload = {
+                            timestamp: nowString,
+                            type: 'payout_email',
+                            sender: 'Master Administrator',
+                            username: client.username,
+                            role: 'admin',
+                            message: `[NOTIFIKASI E-MEL PEMBAYARAN KOMISEN]\nKepada: ${client.email}\nSyarikat: ${client.companyName || client.username}\n\nSukacita dimaklumkan pembayaran komisen affiliate sebanyak RM ${payoutAmount.toFixed(2)} telah berjaya dikreditkan ke akaun ${bankData.bankName} (${bankData.accountNo}).\n\nTerima kasih,\nArchitech Labs`
+                        };
+
+                        try {
+                            await fetch(backupEndpointUrl, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(emailPayload)
+                            });
+                        } catch (err) {
+                            console.error("Gagal rekod e-mel payout ke DB sheet:", err);
+                        }
+
+                        alert(`Payout sebanyak RM ${payoutAmount.toFixed(2)} berjaya diproses!\n\n- Baki E-Wallet klien telah ditolak kepada RM0.00.\n- Rekod pembayaran & notifikasi e-mel telah dihantar kepada (${client.email}).`);
+                    }
                 },
 
                 toggleHumanTouch() {
@@ -797,7 +940,7 @@
                 deleteClient(index) {
                     if (confirm('Adakah anda pasti mahu memadam akaun klien ini?')) {
                         this.clients.splice(index, 1);
-                        this.saveClient();
+                        this.saveClients();
                     }
                 }
             }

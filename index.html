@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEEA System - Master Administrator Panel</title>
+    <title>LEEA System - Administrator Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -65,7 +65,7 @@
                 <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center glow-effect">
                     <i class="fa-solid fa-shield-halved text-white text-sm"></i>
                 </div>
-                <span class="font-black text-lg tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">LEEA ADMIN MASTER</span>
+                <span class="font-black text-lg tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">LEEA SYSTEM [administrator panel]</span>
             </div>
 
             <template x-if="isUnlocked && isLoggedIn">
@@ -139,7 +139,7 @@
             <div class="space-y-6">
                 <div class="bg-gradient-to-r from-blue-900/50 via-indigo-900/40 to-gray-900 rounded-2xl p-6 text-white cyber-border glow-effect flex justify-between items-center">
                     <div>
-                        <h1 class="text-2xl font-black text-white">Master Control Panel</h1>
+                        <h1 class="text-2xl font-black text-white">Administrator Panel</h1>
                         <p class="text-indigo-300 text-xs font-mono mt-1">Urus akaun klien, tetapan pelayan Railway, dan hantar e-mel TQ automatik.</p>
                         <p class="text-xs text-blue-400 mt-2 font-mono">
                             <i class="fa-solid fa-clock-rotate-left mr-1"></i> Kemaskini Terkini: <span x-text="lastUpdatedTime"></span>
@@ -190,7 +190,7 @@
                     </div>
                 </div>
 
-                <!-- Bahagian Pengurusan Kod Akses & Realtime LEEA Bot (Diletakkan di Ruang Kotak Garis Merah) -->
+                <!-- Bahagian Pengurusan Kod Akses & Realtime LEEA Bot -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <!-- Kiri: Pengurusan Kod Unlock Khas -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between">
@@ -227,14 +227,13 @@
                         </form>
                     </div>
 
-                    <!-- Kanan: Realtime LEEA Bot & Human Touch (Mengisi Ruang Kosong Sebelah Kanan) -->
+                    <!-- Kanan: Realtime LEEA Bot & Human Touch -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 flex flex-col justify-between font-mono">
                         <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                             <div class="flex items-center space-x-2">
                                 <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
                                 <h3 class="font-bold text-xs text-blue-300 uppercase">Realtime LEEA Bot (Webhook)</h3>
                             </div>
-                            <!-- Butang Human Touch -->
                             <button @click="toggleHumanTouch()" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition flex items-center space-x-1" :class="humanTouchActive ? 'bg-amber-600 text-white shadow' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'">
                                 <i class="fa-solid fa-headset"></i>
                                 <span x-text="humanTouchActive ? 'Human: ON' : 'Human: OFF'"></span>
@@ -285,6 +284,41 @@
                             URL: https://leeasystem-production.up.railway.app
                         </div>
                     </div>
+                </div>
+
+                <!-- KOTAK HANTAR MESEJ KEPADA KLIEN -->
+                <div class="bg-gray-900 p-6 rounded-2xl cyber-border space-y-4 font-mono text-xs">
+                    <div class="border-b border-gray-800 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-paper-plane text-blue-400"></i>
+                        <h3 class="font-bold text-sm text-blue-300 uppercase">Hantar Mesej / Notifikasi kepada Klien (Inbox)</h3>
+                    </div>
+
+                    <form @submit.prevent="sendAdminBroadcastMessage()" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block uppercase text-blue-400 mb-1">Pilih Penerima Klien</label>
+                                <select x-model="broadcastForm.target" class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500">
+                                    <option value="ALL">📢 Semua Klien (All Clients)</option>
+                                    <template x-for="client in clients" :key="client.clientId">
+                                        <option :value="client.username" x-text="client.clientId + ' - ' + (client.companyName || client.username)"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block uppercase text-blue-400 mb-1">Tajuk / Pengirim</label>
+                                <input type="text" x-model="broadcastForm.senderTitle" placeholder="Contoh: Master Administrator" required class="w-full px-3 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block uppercase text-blue-400 mb-1">Kandungan Mesej</label>
+                            <textarea x-model="broadcastForm.content" rows="3" placeholder="Taip mesej atau pengumuman sistem di sini..." required class="w-full p-3 bg-gray-950 border border-gray-800 rounded-xl text-blue-100 focus:outline-none focus:border-blue-500 leading-relaxed"></textarea>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow glow-effect transition">Hantar Mesej Klien</button>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Jadual Senarai Klien -->
@@ -379,7 +413,7 @@
     </main>
 
     <footer class="mt-auto py-6 border-t border-gray-900 text-center text-xs font-mono text-gray-500">
-        &copy; 2026 LEEA AI SYSTEM. Master Admin Node. All Rights Reserved.
+        &copy; 2026 LEEA AI SYSTEM. All Rights Reserved.
     </footer>
 
     <script>
@@ -405,6 +439,12 @@
                 activeChat: null,
                 adminReplyText: '',
                 humanTouchActive: false,
+                
+                broadcastForm: {
+                    target: 'ALL',
+                    senderTitle: 'Master Administrator',
+                    content: ''
+                },
                 
                 vercelStatus: {
                     isOnline: false,
@@ -445,8 +485,42 @@
                     alert(this.humanTouchActive ? 'Mod Human Touch diaktifkan!' : 'Mod Human Touch ditutup.');
                 },
 
+                sendAdminBroadcastMessage() {
+                    if (!this.broadcastForm.content.trim()) return;
+
+                    const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
+                    const newMsg = {
+                        senderTitle: this.broadcastForm.senderTitle,
+                        date: nowString,
+                        content: this.broadcastForm.content
+                    };
+
+                    let allInbox = {};
+                    try {
+                        allInbox = JSON.parse(localStorage.getItem('leea_admin_inbox') || '{}');
+                    } catch(e) {
+                        allInbox = {};
+                    }
+
+                    if (this.broadcastForm.target === 'ALL') {
+                        this.clients.forEach(c => {
+                            if (!allInbox[c.username]) allInbox[c.username] = [];
+                            allInbox[c.username].unshift(newMsg);
+                        });
+                        alert('Mesej berjaya dihantar kepada SEMUA KLIEN!');
+                    } else {
+                        const targetUser = this.broadcastForm.target;
+                        if (!allInbox[targetUser]) allInbox[targetUser] = [];
+                        allInbox[targetUser].unshift(newMsg);
+                        alert('Mesej berjaya dihantar kepada klien: ' + targetUser);
+                    }
+
+                    localStorage.setItem('leea_admin_inbox', JSON.stringify(allInbox));
+                    this.broadcastForm.content = '';
+                },
+
                 async fetchLiveChats() {
-                    const url = "https://script.google.com/macros/s/AKfycbyvSzjcJblEzJNGMSqxVCwwoCMJts32fVB6Q6MnFV-Cqm8mgZIqIMxV5weJSPDwB1pf3g/exec?t=" + new Date().getTime();
+                    const url = "https://script.google.com/macros/s/AKfycbyv6mxISC-5OJ_Cli3RcPAxQaMJvUSQx5wlyBvg7N2nSh4BBVle7UXimJp7jy94mEB_/exec?t=" + new Date().getTime();
                     try {
                         const res = await fetch(url);
                         const data = await res.json();
@@ -510,7 +584,6 @@
 
                     const targetUrl = 'https://leeasystem-production.up.railway.app';
                     try {
-                        // Menggunakan mode no-cors untuk mengelakkan sekatan pelayar web
                         await fetch(targetUrl, { method: 'GET', mode: 'no-cors' });
                         this.railwayStatus.isOnline = true;
                         this.railwayStatus.statusText = 'ONLINE & ACTIVE 🟢';

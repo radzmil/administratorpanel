@@ -79,7 +79,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col justify-center space-y-6">
 
-        <!-- FASA 1: Skrin Masukkan 4-Digit Unlock Code -->
+        <!-- FASA 1: Security Clearance -->
         <template x-if="!isUnlocked">
             <div class="max-w-md mx-auto space-y-6 w-full">
                 <div class="ai-digital-bg rounded-3xl p-6 md:p-8 text-white shadow-2xl glow-effect cyber-border backdrop-blur-md text-center">
@@ -102,7 +102,7 @@
             </div>
         </template>
 
-        <!-- FASA 2: Log Masuk Admin (Selepas Unlock Code Sah) -->
+        <!-- FASA 2: Login Admin -->
         <template x-if="isUnlocked && !isLoggedIn">
             <div class="max-w-md mx-auto space-y-6 w-full">
                 <div class="ai-digital-bg rounded-3xl p-6 md:p-8 text-white shadow-2xl glow-effect cyber-border backdrop-blur-md">
@@ -129,7 +129,7 @@
             </div>
         </template>
 
-        <!-- FASA 3: Papan Pemuka Admin (Master Dashboard) -->
+        <!-- FASA 3: Dashboard Admin -->
         <template x-if="isUnlocked && isLoggedIn">
             <div class="space-y-6 text-xs">
                 <div class="bg-gradient-to-r from-blue-950 via-indigo-950 to-gray-900 rounded-2xl p-6 text-white cyber-border glow-effect shadow-xl flex justify-between items-center">
@@ -185,12 +185,12 @@
                     </div>
                 </div>
 
-                <!-- REALTIME CHAT (SBL TRANSPORT BOT) -->
+                <!-- REALTIME CHAT (LEEA BOT) -->
                 <div class="bg-gray-900 p-6 rounded-2xl cyber-border shadow-md space-y-4">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                         <div class="flex items-center space-x-2">
                             <div class="w-3.5 h-3.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                            <h3 class="font-bold text-sm text-blue-300 uppercase tracking-wide">Realtime SBLTransport Bot (Webhook)</h3>
+                            <h3 class="font-bold text-sm text-blue-300 uppercase tracking-wide">Realtime LEEA Bot (Webhook)</h3>
                         </div>
                         <button @click="toggleHumanTouch()" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-sm" :class="humanTouchActive ? 'bg-amber-600 text-white shadow' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'">
                             <i class="fa-solid fa-headset text-sm"></i>
@@ -207,21 +207,21 @@
                                 </div>
                             </template>
                             <template x-if="liveChats.length === 0">
-                                <div class="p-8 text-center text-gray-500 text-xs font-medium">Menunggu chat SBLTransport Bot...</div>
+                                <div class="p-8 text-center text-gray-500 text-xs font-medium">Menunggu rekod perbualan LEEA Bot di Google Sheets...</div>
                             </template>
                         </div>
 
                         <div class="md:col-span-8 flex flex-col bg-gray-950/40 rounded-xl p-4 justify-between shadow-inner">
                             <template x-if="!activeChat">
                                 <div class="flex items-center justify-center flex-grow text-gray-400 text-sm font-medium text-center p-6">
-                                    Sila pilih senarai perbualan SBLTransport Bot di sebelah kiri untuk pantau / balas.
+                                    Sila pilih senarai perbualan LEEA Bot di sebelah kiri untuk pantau / balas.
                                 </div>
                             </template>
                             <template x-if="activeChat">
                                 <div class="flex flex-col h-full justify-between space-y-3">
                                     <div class="p-3.5 bg-gray-900 border border-gray-800 rounded-xl font-bold text-blue-300 text-sm shadow-sm flex justify-between items-center">
-                                        <span x-text="'Chat SBLTransport bersama: ' + activeChat.phone"></span>
-                                        <span class="text-[11px] text-emerald-400 font-bold uppercase">SBLTransport Active</span>
+                                        <span x-text="'Chat bersama: ' + activeChat.phone"></span>
+                                        <span class="text-[11px] text-emerald-400 font-bold uppercase">LEEA Active</span>
                                     </div>
                                     <div class="overflow-y-auto space-y-2.5 text-xs max-h-[210px] p-2 flex-grow">
                                         <template x-for="msg in activeChat.messages">
@@ -234,7 +234,7 @@
                                     </div>
                                     
                                     <form @submit.prevent="sendAdminReply()" class="flex space-x-2 pt-2 items-center">
-                                        <input type="text" x-model="adminReplyText" :placeholder="humanTouchActive ? 'Taip mesej manual SBLTransport...' : 'Aktifkan Human Touch di atas...'" class="flex-grow px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-xs text-blue-100 focus:outline-none shadow-sm font-medium">
+                                        <input type="text" x-model="adminReplyText" :placeholder="humanTouchActive ? 'Taip mesej manual LEEA...' : 'Aktifkan Human Touch di atas...'" class="flex-grow px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-xs text-blue-100 focus:outline-none shadow-sm font-medium">
                                         <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition shadow whitespace-nowrap">Hantar</button>
                                     </form>
                                 </div>
@@ -249,7 +249,6 @@
 
                 <!-- HANTAR MESEJ INBOX & KOD UNLOCK KHAS -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Kiri: Hantar Mesej / Notifikasi kepada Klien (Inbox) -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border shadow-md space-y-4 flex flex-col justify-between">
                         <div class="border-b border-gray-800 pb-3 flex items-center space-x-2">
                             <i class="fa-solid fa-paper-plane text-blue-400 text-base"></i>
@@ -283,7 +282,6 @@
                         </form>
                     </div>
 
-                    <!-- Kanan: Pengurusan Kod Unlock Khas -->
                     <div class="lg:col-span-6 bg-gray-900 p-6 rounded-2xl cyber-border shadow-md space-y-4 flex flex-col justify-between">
                         <div class="space-y-4">
                             <h3 class="font-bold text-sm text-blue-300">Pengurusan Kod Unlock Khas (Pegawai / Admin Baru)</h3>
@@ -502,6 +500,9 @@
                 adminReplyText: '',
                 humanTouchActive: false,
                 
+                // ENDPOINT GOOGLE APPS SCRIPT RASMI
+                gasEndpointUrl: "https://script.google.com/macros/s/AKfycbyqrB75MYg92E8thEiMPMF1ws1irQpQger3nTZryzR_jIBDHspdSHpE3kHtweCGWHT5/exec",
+
                 broadcastForm: {
                     target: 'ALL',
                     senderTitle: 'Master Administrator',
@@ -605,7 +606,6 @@
                         localStorage.setItem('leea_affiliate_' + client.username, JSON.stringify(fullData));
 
                         const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
-                        const backupEndpointUrl = "https://script.google.com/macros/s/AKfycbxepClLNwN4zrgkQpfWlRL6yC_sUWTH_WyxpdabwPvwxq3FNtngMBRHwSS8BAWd9bXgQw/exec";
 
                         const emailPayload = {
                             timestamp: nowString,
@@ -617,7 +617,7 @@
                         };
 
                         try {
-                            await fetch(backupEndpointUrl, {
+                            await fetch(this.gasEndpointUrl, {
                                 method: 'POST',
                                 mode: 'no-cors',
                                 headers: { 'Content-Type': 'application/json' },
@@ -633,14 +633,13 @@
 
                 toggleHumanTouch() {
                     this.humanTouchActive = !this.humanTouchActive;
-                    alert(this.humanTouchActive ? 'Mod Human Touch SBLTransport diaktifkan!' : 'Mod Human Touch ditutup.');
+                    alert(this.humanTouchActive ? 'Mod Human Touch diaktifkan!' : 'Mod Human Touch ditutup.');
                 },
 
                 async sendAdminBroadcastMessage() {
                     if (!this.broadcastForm.content.trim()) return;
 
                     const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
-                    const inboxScriptUrl = "https://script.google.com/macros/s/AKfycbxepClLNwN4zrgkQpfWlRL6yC_sUWTH_WyxpdabwPvwxq3FNtngMBRHwSS8BAWd9bXgQw/exec";
 
                     const payload = {
                         timestamp: nowString,
@@ -653,7 +652,7 @@
                     };
 
                     try {
-                        await fetch(inboxScriptUrl, {
+                        await fetch(this.gasEndpointUrl, {
                             method: 'POST',
                             mode: 'no-cors',
                             headers: { 'Content-Type': 'application/json' },
@@ -668,7 +667,7 @@
                 },
 
                 async fetchLiveChats() {
-                    const url = "https://script.google.com/macros/s/AKfycbxepClLNwN4zrgkQpfWlRL6yC_sUWTH_WyxpdabwPvwxq3FNtngMBRHwSS8BAWd9bXgQw/exec?t=" + new Date().getTime();
+                    const url = this.gasEndpointUrl + "?t=" + new Date().getTime();
                     try {
                         const res = await fetch(url);
                         const data = await res.json();
@@ -680,7 +679,7 @@
                                 if (row.type && row.type !== 'chat') return;
 
                                 let phone = row.phone ? String(row.phone).trim() : lastPhone;
-                                if (!phone || phone === "Unknown") phone = lastPhone;
+                                if (!phone || phone === "Unknown" || phone === "-") phone = lastPhone;
                                 else lastPhone = phone;
 
                                 const cleanPhone = phone.replace(/[^0-9]/g, '');
@@ -701,35 +700,37 @@
                             this.liveChats = Object.values(chatMap);
                             if (this.liveChats.length > 0 && !this.activeChat) {
                                 this.activeChat = this.liveChats[0];
+                            } else if (this.activeChat) {
+                                const found = this.liveChats.find(c => c.id === this.activeChat.id);
+                                if (found) this.activeChat = found;
                             }
                         }
                     } catch (err) {
-                        console.error("Gagal tarik data chat SBLTransport:", err);
+                        console.error("Gagal tarik data chat LEEA Bot:", err);
                     }
                 },
 
                 async sendAdminReply() {
                     if (!this.adminReplyText.trim() || !this.activeChat) return;
                     if (!this.humanTouchActive) {
-                        alert('Sila aktifkan "Human Touch" terlebih dahulu untuk membalas chat SBLTransport!');
+                        alert('Sila aktifkan "Human Touch" terlebih dahulu!');
                         return;
                     }
 
                     const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
-                    const scriptUrl = "https://script.google.com/macros/s/AKfycbxepClLNwN4zrgkQpfWlRL6yC_sUWTH_WyxpdabwPvwxq3FNtngMBRHwSS8BAWd9bXgQw/exec";
 
                     const payload = {
                         timestamp: nowString,
                         type: 'chat',
-                        sender: 'SBLAdmin',
+                        sender: 'LEEA Admin',
                         phone: this.activeChat.phone,
                         role: 'agent',
                         message: this.adminReplyText,
-                        targetClient: 'sbltransport'
+                        targetClient: 'ALL'
                     };
 
                     try {
-                        await fetch(scriptUrl, {
+                        await fetch(this.gasEndpointUrl, {
                             method: 'POST',
                             mode: 'no-cors',
                             headers: { 'Content-Type': 'application/json' },
@@ -740,7 +741,7 @@
                         this.activeChat.lastMessage = this.adminReplyText;
                         this.adminReplyText = '';
                     } catch(err) {
-                        console.error("Gagal hantar balasan chat SBLTransport:", err);
+                        console.error("Gagal hantar balasan chat:", err);
                     }
                 },
 

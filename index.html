@@ -79,7 +79,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col justify-center space-y-6">
 
-        <!-- FASA 1: Security Clearance -->
+        <!-- FASA 1: Skrin Masukkan 4-Digit Unlock Code -->
         <template x-if="!isUnlocked">
             <div class="max-w-md mx-auto space-y-6 w-full">
                 <div class="ai-digital-bg rounded-3xl p-6 md:p-8 text-white shadow-2xl glow-effect cyber-border backdrop-blur-md text-center">
@@ -102,7 +102,7 @@
             </div>
         </template>
 
-        <!-- FASA 2: Login Admin -->
+        <!-- FASA 2: Log Masuk Admin (Selepas Unlock Code Sah) -->
         <template x-if="isUnlocked && !isLoggedIn">
             <div class="max-w-md mx-auto space-y-6 w-full">
                 <div class="ai-digital-bg rounded-3xl p-6 md:p-8 text-white shadow-2xl glow-effect cyber-border backdrop-blur-md">
@@ -129,9 +129,10 @@
             </div>
         </template>
 
-        <!-- FASA 3: Dashboard Admin -->
+        <!-- FASA 3: Papan Pemuka Admin (Master Dashboard) -->
         <template x-if="isUnlocked && isLoggedIn">
             <div class="space-y-6 text-xs">
+                <!-- KOTAK ATAS: Tona Gelap Korporat Jelas & Bersih -->
                 <div class="bg-gradient-to-r from-blue-950 via-indigo-950 to-gray-900 rounded-2xl p-6 text-white cyber-border glow-effect shadow-xl flex justify-between items-center">
                     <div>
                         <h1 class="text-2xl font-black text-white">Administrator Panel</h1>
@@ -185,7 +186,7 @@
                     </div>
                 </div>
 
-                <!-- REALTIME CHAT (LEEA BOT) -->
+                <!-- REALTIME CHAT (LEEA BOT) - MASA MENGIKUT WAKTU PIAWAI MALAYSIA PERSIS WHATSAPP -->
                 <div class="bg-gray-900 p-6 rounded-2xl cyber-border shadow-md space-y-4">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                         <div class="flex items-center space-x-2">
@@ -198,11 +199,15 @@
                         </button>
                     </div>
 
+                    <!-- Live Chat Area Lengkap & Luas -->
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 h-[360px]">
                         <div class="md:col-span-4 border-r border-gray-800 overflow-y-auto divide-y divide-gray-800 text-xs bg-gray-950/40 rounded-xl p-2 shadow-inner">
                             <template x-for="chat in liveChats" :key="chat.id">
                                 <div @click="activeChat = chat" class="p-3.5 cursor-pointer hover:bg-gray-800/40 transition rounded-xl font-medium" :class="activeChat && activeChat.id === chat.id ? 'bg-blue-950/80 border-l-4 border-blue-500 font-bold' : ''">
-                                    <div class="font-bold text-blue-200 text-sm" x-text="chat.phone"></div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-bold text-blue-200 text-sm" x-text="chat.phone"></span>
+                                        <span class="text-[10px] text-gray-400 font-mono" x-text="chat.lastTime"></span>
+                                    </div>
                                     <div class="text-gray-400 truncate mt-1 text-xs" x-text="chat.lastMessage"></div>
                                 </div>
                             </template>
@@ -221,21 +226,22 @@
                                 <div class="flex flex-col h-full justify-between space-y-3">
                                     <div class="p-3.5 bg-gray-900 border border-gray-800 rounded-xl font-bold text-blue-300 text-sm shadow-sm flex justify-between items-center">
                                         <span x-text="'Chat bersama: ' + activeChat.phone"></span>
-                                        <span class="text-[11px] text-emerald-400 font-bold uppercase">LEEA Active</span>
+                                        <span class="text-[11px] text-emerald-400 font-bold uppercase">Waktu Malaysia (GMT+8)</span>
                                     </div>
                                     <div class="overflow-y-auto space-y-2.5 text-xs max-h-[210px] p-2 flex-grow">
                                         <template x-for="msg in activeChat.messages">
                                             <div class="flex" :class="msg.sender === 'customer' ? 'justify-start' : 'justify-end'">
                                                 <div class="max-w-[85%] rounded-2xl px-4 py-2.5 text-xs font-medium shadow-sm" :class="msg.sender === 'customer' ? 'bg-gray-800 text-gray-200' : 'bg-blue-600 text-white font-semibold'">
                                                     <p x-text="msg.text"></p>
+                                                    <span class="text-[10px] opacity-70 block text-right mt-1 font-mono" x-text="msg.time"></span>
                                                 </div>
                                             </div>
                                         </template>
                                     </div>
                                     
                                     <form @submit.prevent="sendAdminReply()" class="flex space-x-2 pt-2 items-center">
-                                        <input type="text" x-model="adminReplyText" :placeholder="humanTouchActive ? 'Taip mesej manual LEEA...' : 'Aktifkan Human Touch di atas...'" class="flex-grow px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-xs text-blue-100 focus:outline-none shadow-sm font-medium">
-                                        <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition shadow whitespace-nowrap">Hantar</button>
+                                        <input type="text" x-model="adminReplyText" :placeholder="humanTouchActive ? 'Taip mesej manual LEEA...' : 'Aktifkan Human Touch di atas...'" :disabled="!humanTouchActive" class="flex-grow px-4 py-3 bg-gray-950 border border-gray-800 rounded-xl text-xs text-blue-100 focus:outline-none shadow-sm font-medium disabled:opacity-50">
+                                        <button type="submit" :disabled="!humanTouchActive" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition shadow whitespace-nowrap disabled:opacity-50">Hantar</button>
                                     </form>
                                 </div>
                             </template>
@@ -380,7 +386,7 @@
                     </div>
                 </div>
 
-                <!-- Jadual Senarai Klien -->
+                <!-- JADUAL SENARAI KLIEN LENGKAP -->
                 <div class="bg-gray-900 rounded-2xl cyber-border overflow-hidden shadow-md">
                     <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950">
                         <h3 class="font-bold text-sm text-blue-300">Senarai Akaun Klien & ID Neural</h3>
@@ -409,7 +415,7 @@
                                         <td class="p-4 font-bold text-blue-400 text-sm" x-text="client.clientId"></td>
                                         <td class="p-4 font-bold text-white text-sm" x-text="client.companyName || client.username"></td>
                                         <td class="p-4 font-bold text-indigo-300" x-text="client.username"></td>
-                                        <td class="p-4"><code class="px-3 py-1 bg-gray-950 border border-gray-800 rounded font-bold text-gray-200" x-text="client.password || '-'"></code></td>
+                                        <td class="p-4"><code class="px-2.5 py-1 bg-gray-950 border border-gray-800 rounded font-bold text-gray-200" x-text="client.password || '-'"></code></td>
                                         <td class="p-4 text-xs text-gray-400">
                                             <div class="font-bold text-gray-200" x-text="client.phone || '-'"></div>
                                             <div class="text-blue-400 font-semibold" x-text="client.email || '-'"></div>
@@ -430,7 +436,7 @@
             </div>
         </template>
 
-        <!-- Modal Tambah/Edit Klien -->
+        <!-- MODAL TAMBAH/EDIT KLIEN LENGKAP -->
         <div x-show="showClientModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" style="display: none;">
             <div class="bg-gray-900 w-full max-w-md rounded-2xl shadow-2xl cyber-border overflow-hidden flex flex-col text-white">
                 <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-950">
@@ -500,7 +506,7 @@
                 adminReplyText: '',
                 humanTouchActive: false,
                 
-                // ENDPOINT GOOGLE APPS SCRIPT RASMI
+                // ENDPOINT GOOGLE APPS SCRIPT RASMI TAB Log_Chat
                 gasEndpointUrl: "https://script.google.com/macros/s/AKfycbyqrB75MYg92E8thEiMPMF1ws1irQpQger3nTZryzR_jIBDHspdSHpE3kHtweCGWHT5/exec",
 
                 broadcastForm: {
@@ -548,6 +554,41 @@
                             this.fetchLiveChats();
                         }
                     }, 4000);
+                },
+
+                // PENUKARAN FORMAT WAKTU MALAYSIA SAMA SEPERTI WHATSAPP (CONTOH: 03:07 PM)
+                formatMalaysiaTime(rawTime) {
+                    if (!rawTime) return '';
+                    try {
+                        const str = String(rawTime).trim();
+                        if (str.includes('AM') || str.includes('PM')) {
+                            const timeMatch = str.match(/\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)/i);
+                            if (timeMatch) {
+                                return timeMatch[0].replace(/:\d{2}\s/, ' ');
+                            }
+                        }
+
+                        const d = new Date(rawTime);
+                        if (!isNaN(d.getTime())) {
+                            return d.toLocaleTimeString('en-US', {
+                                timeZone: 'Asia/Kuala_Lumpur',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            });
+                        }
+                    } catch (e) {}
+
+                    return String(rawTime).substring(11, 16);
+                },
+
+                getMalaysiaNowTime() {
+                    return new Date().toLocaleTimeString('en-US', {
+                        timeZone: 'Asia/Kuala_Lumpur',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
                 },
 
                 toggleTheme() {
@@ -605,7 +646,15 @@
                         fullData.data = affData;
                         localStorage.setItem('leea_affiliate_' + client.username, JSON.stringify(fullData));
 
-                        const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
+                        const nowString = new Date().toLocaleString('en-GB', {
+                            timeZone: 'Asia/Kuala_Lumpur',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                        });
 
                         const emailPayload = {
                             timestamp: nowString,
@@ -639,10 +688,10 @@
                 async sendAdminBroadcastMessage() {
                     if (!this.broadcastForm.content.trim()) return;
 
-                    const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
+                    const nowMalaysiaDate = new Date().toLocaleString('en-GB', { timeZone: 'Asia/Kuala_Lumpur' });
 
                     const payload = {
-                        timestamp: nowString,
+                        timestamp: nowMalaysiaDate,
                         type: 'inbox',
                         sender: this.broadcastForm.senderTitle,
                         phone: '-',
@@ -684,16 +733,19 @@
 
                                 const cleanPhone = phone.replace(/[^0-9]/g, '');
                                 if (!chatMap[cleanPhone]) {
-                                    chatMap[cleanPhone] = { id: 'chat-' + cleanPhone, phone: cleanPhone, lastMessage: '', time: '', messages: [] };
+                                    chatMap[cleanPhone] = { id: 'chat-' + cleanPhone, phone: cleanPhone, lastMessage: '', lastTime: '', messages: [] };
                                 }
+
+                                const formattedTime = this.formatMalaysiaTime(row.timestamp);
+
                                 if (row.message) {
                                     chatMap[cleanPhone].messages.push({
                                         sender: row.role || 'customer',
                                         text: row.message,
-                                        time: row.timestamp ? String(row.timestamp).substring(11, 16) : ''
+                                        time: formattedTime
                                     });
                                     chatMap[cleanPhone].lastMessage = row.message;
-                                    chatMap[cleanPhone].time = row.timestamp ? String(row.timestamp).substring(11, 16) : '';
+                                    chatMap[cleanPhone].lastTime = formattedTime;
                                 }
                             });
 
@@ -717,10 +769,21 @@
                         return;
                     }
 
-                    const nowString = new Date().toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true });
+                    const nowMalaysiaDate = new Date().toLocaleString('en-GB', {
+                        timeZone: 'Asia/Kuala_Lumpur',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+
+                    const displayTime = this.getMalaysiaNowTime();
 
                     const payload = {
-                        timestamp: nowString,
+                        timestamp: nowMalaysiaDate,
                         type: 'chat',
                         sender: 'LEEA Admin',
                         phone: this.activeChat.phone,
@@ -737,8 +800,9 @@
                             body: JSON.stringify(payload)
                         });
 
-                        this.activeChat.messages.push({ sender: 'agent', text: this.adminReplyText, time: 'Now' });
+                        this.activeChat.messages.push({ sender: 'agent', text: this.adminReplyText, time: displayTime });
                         this.activeChat.lastMessage = this.adminReplyText;
+                        this.activeChat.lastTime = displayTime;
                         this.adminReplyText = '';
                     } catch(err) {
                         console.error("Gagal hantar balasan chat:", err);
@@ -746,9 +810,6 @@
                 },
 
                 async checkDeployStatus() {
-                    this.vercelStatus.statusText = 'Menyemak Vercel...';
-                    this.railwayStatus.statusText = 'Menyemak Railway...';
-
                     try {
                         await fetch('https://leea-portal.vercel.app', { method: 'GET', mode: 'no-cors' });
                         this.vercelStatus.isOnline = true;
@@ -758,9 +819,8 @@
                         this.vercelStatus.statusText = 'SEDANG DEPLOY / OFFLINE 🟡';
                     }
 
-                    const targetUrl = 'https://leeasystem-production.up.railway.app';
                     try {
-                        await fetch(targetUrl, { method: 'GET', mode: 'no-cors' });
+                        await fetch('https://leeasystem-production.up.railway.app', { method: 'GET', mode: 'no-cors' });
                         this.railwayStatus.isOnline = true;
                         this.railwayStatus.statusText = 'ONLINE & ACTIVE 🟢';
                     } catch (err) {
@@ -768,10 +828,8 @@
                         this.railwayStatus.statusText = 'OFFLINE / REDEPLOYING... 🟡';
                     }
 
-                    const now = new Date();
-                    const timeString = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-                    this.vercelStatus.lastChecked = timeString;
-                    this.railwayStatus.lastChecked = timeString;
+                    this.vercelStatus.lastChecked = this.getMalaysiaNowTime();
+                    this.railwayStatus.lastChecked = this.getMalaysiaNowTime();
                 },
 
                 fetchAdminPins() {
@@ -828,7 +886,16 @@
 
                 updateTimestamp() {
                     const now = new Date();
-                    this.lastUpdatedTime = now.toLocaleString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                    this.lastUpdatedTime = now.toLocaleString('en-GB', {
+                        timeZone: 'Asia/Kuala_Lumpur',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
                 },
 
                 fetchClients() {
